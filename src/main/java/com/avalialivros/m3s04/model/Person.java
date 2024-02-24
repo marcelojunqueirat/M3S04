@@ -1,5 +1,6 @@
 package com.avalialivros.m3s04.model;
 
+import com.avalialivros.m3s04.model.transport.operations.CreatePersonDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 @Entity
 public class Person implements UserDetails {
@@ -23,6 +25,28 @@ public class Person implements UserDetails {
 
     @Column(nullable = false)
     private String password;
+
+    public Person() {
+    }
+
+    public Person(CreatePersonDTO createPersonDTO, String password) {
+        this.guid = UUID.randomUUID().toString();
+        this.name = createPersonDTO.name();
+        this.email = createPersonDTO.email();
+        this.password = password;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
