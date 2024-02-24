@@ -7,6 +7,7 @@ import com.avalialivros.m3s04.model.Book;
 import com.avalialivros.m3s04.model.Person;
 import com.avalialivros.m3s04.model.Rating;
 import com.avalialivros.m3s04.model.transport.BookDTO;
+import com.avalialivros.m3s04.model.transport.BookRatedDTO;
 import com.avalialivros.m3s04.model.transport.RatingDTO;
 import com.avalialivros.m3s04.model.transport.operations.CreateBookDTO;
 import com.avalialivros.m3s04.model.transport.operations.CreateRatingDTO;
@@ -17,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class BookService {
@@ -57,5 +61,15 @@ public class BookService {
         Rating rating = this.ratingRepository.save(new Rating(body, person, book));
         LOGGER.info("Avaliação salva, retornando-a...");
         return new RatingDTO(rating);
+    }
+
+    public List<BookRatedDTO> list(){
+        List<Book> books = this.bookRepository.findAll();
+        List<BookRatedDTO> listDTO = new ArrayList<>();
+        for (Book book : books) {
+            listDTO.add(new BookRatedDTO(book));
+        }
+
+        return listDTO;
     }
 }

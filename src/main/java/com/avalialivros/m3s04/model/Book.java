@@ -1,6 +1,7 @@
 package com.avalialivros.m3s04.model;
 
 import com.avalialivros.m3s04.model.transport.operations.CreateBookDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -23,6 +24,7 @@ public class Book {
     @Column(nullable = false)
     private Integer yearOfPublication;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "ratedBook")
     private Set<Rating> grades = new HashSet<>();
 
@@ -54,5 +56,17 @@ public class Book {
 
     public Set<Rating> getGrades() {
         return grades;
+    }
+
+    public Double getAverageGrades() {
+        Double sum = Double.valueOf(
+                this.grades.stream()
+                .map(rating -> rating.getGrade())
+                .reduce(0, Integer::sum));
+        Double sizeOfList = (double) this.grades.size();
+        if(sum > 0 && sizeOfList > 0){
+            return (double) (sum / sizeOfList);
+        }
+        return 0.0;
     }
 }
