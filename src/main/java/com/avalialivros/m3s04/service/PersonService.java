@@ -1,5 +1,6 @@
 package com.avalialivros.m3s04.service;
 
+import com.avalialivros.m3s04.exceptions.PersonNotFoundException;
 import com.avalialivros.m3s04.model.Person;
 import com.avalialivros.m3s04.model.transport.PersonDTO;
 import com.avalialivros.m3s04.model.transport.operations.CreatePersonDTO;
@@ -39,5 +40,11 @@ public class PersonService implements UserDetailsService {
         String passwordEnconded = this.passwordEncoder.encode(createPersonDTO.password());
         Person person = this.personRepository.save(new Person(createPersonDTO, passwordEnconded));
         return new PersonDTO(person);
+    }
+
+    public Person findByEmail(String email) throws PersonNotFoundException {
+        LOGGER.info("Buscando usuário por e-mail...");
+        return this.personRepository.findByEmail(email)
+                .orElseThrow(() -> new PersonNotFoundException("Usuário não encontrado"));
     }
 }

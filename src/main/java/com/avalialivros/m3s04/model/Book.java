@@ -1,9 +1,11 @@
 package com.avalialivros.m3s04.model;
 
+import com.avalialivros.m3s04.model.transport.operations.CreateBookDTO;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 public class Book {
@@ -24,4 +26,33 @@ public class Book {
     @OneToMany(mappedBy = "ratedBook")
     private Set<Rating> grades = new HashSet<>();
 
+    public Book() {
+    }
+
+    public Book(CreateBookDTO book, Person person) {
+        this.guid = UUID.randomUUID().toString();
+        this.title = book.title();
+        this.createdBy = person;
+        this.yearOfPublication = book.yearOfPublication();
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Person getCreatedBy() {
+        return createdBy;
+    }
+
+    public Integer getYearOfPublication() {
+        return yearOfPublication;
+    }
+
+    public Set<Rating> getGrades() {
+        return grades;
+    }
 }
