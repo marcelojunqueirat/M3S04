@@ -1,11 +1,17 @@
 package com.avalialivros.m3s04.service;
 
+import com.avalialivros.m3s04.exceptions.BookNotFoundException;
+import com.avalialivros.m3s04.exceptions.BookRegisteredByThePersonException;
 import com.avalialivros.m3s04.exceptions.PersonNotFoundException;
 import com.avalialivros.m3s04.model.Book;
 import com.avalialivros.m3s04.model.Person;
+import com.avalialivros.m3s04.model.Rating;
 import com.avalialivros.m3s04.model.transport.BookDTO;
+import com.avalialivros.m3s04.model.transport.RatingDTO;
 import com.avalialivros.m3s04.model.transport.operations.CreateBookDTO;
+import com.avalialivros.m3s04.model.transport.operations.CreateRatingDTO;
 import com.avalialivros.m3s04.repository.BookRepository;
+import com.avalialivros.m3s04.repository.RatingRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +25,12 @@ public class BookService {
 
     private BookRepository bookRepository;
     private PersonService personService;
+    private RatingRepository ratingRepository;
 
-    public BookService(BookRepository bookRepository, PersonService personService) {
+    public BookService(BookRepository bookRepository, PersonService personService, RatingRepository ratingRepository) {
         this.bookRepository = bookRepository;
         this.personService = personService;
+        this.ratingRepository = ratingRepository;
     }
 
     @Transactional
@@ -32,5 +40,22 @@ public class BookService {
         Book book = this.bookRepository.save(new Book(body, person));
         LOGGER.info("Livro salvo, retornando-o...");
         return new BookDTO(book);
+    }
+
+    @Transactional
+    public RatingDTO setRating(String guid, CreateRatingDTO body, UserDetails userInSession)
+            throws BookNotFoundException, PersonNotFoundException, BookRegisteredByThePersonException {
+        LOGGER.info("Iniciando a criação de uma avaliação com o usuário de e-mail: {}", userInSession.getUsername());
+        Book book = this.bookRepository.findById(guid)
+                .orElseThrow(() -> new BookNotFoundException("Livro não encontrado."));
+        Person person = this.personService.findByEmail(userInSession.getUsername());
+
+        if(book.getCreatedBy().getGuid() == person.getGuid()) {
+            throw new BookRegisteredByThePersonException("Não é possível avaliar um livro cadastrado por você.");
+        }
+
+        Rating rating = this.ratingRepository.save(new Rating(body, person, book));
+        LOGGER.info("Avaliação salva, retornando-a...");
+        return new RatingDTO(rating);
     }
 }
