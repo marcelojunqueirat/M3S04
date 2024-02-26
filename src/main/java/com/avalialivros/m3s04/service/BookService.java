@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -64,12 +65,9 @@ public class BookService {
     }
 
     public List<BookRatedDTO> list(){
-        List<Book> books = this.bookRepository.findAll();
-        List<BookRatedDTO> listDTO = new ArrayList<>();
-        for (Book book : books) {
-            listDTO.add(new BookRatedDTO(book));
-        }
-
+        List<BookRatedDTO> listDTO = bookRepository.findAll().stream()
+                .map(BookRatedDTO::new)
+                .collect(Collectors.toList());
         return listDTO;
     }
 }
