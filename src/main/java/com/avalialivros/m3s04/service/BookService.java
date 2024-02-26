@@ -8,6 +8,7 @@ import com.avalialivros.m3s04.model.Person;
 import com.avalialivros.m3s04.model.Rating;
 import com.avalialivros.m3s04.model.transport.BookDTO;
 import com.avalialivros.m3s04.model.transport.BookRatedDTO;
+import com.avalialivros.m3s04.model.transport.BookRatedGuidDTO;
 import com.avalialivros.m3s04.model.transport.RatingDTO;
 import com.avalialivros.m3s04.model.transport.operations.CreateBookDTO;
 import com.avalialivros.m3s04.model.transport.operations.CreateRatingDTO;
@@ -19,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,5 +69,10 @@ public class BookService {
                 .map(BookRatedDTO::new)
                 .collect(Collectors.toList());
         return listDTO;
+    }
+
+    public BookRatedGuidDTO findByGuid(String guid) throws BookNotFoundException {
+        return this.bookRepository.findById(guid).map(BookRatedGuidDTO::new)
+                .orElseThrow(() -> new BookNotFoundException("Livro não encontrado."));
     }
 }

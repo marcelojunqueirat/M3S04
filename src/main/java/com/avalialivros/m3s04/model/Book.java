@@ -4,9 +4,7 @@ import com.avalialivros.m3s04.model.transport.operations.CreateBookDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 public class Book {
@@ -24,9 +22,11 @@ public class Book {
     @Column(nullable = false)
     private Integer yearOfPublication;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "ratedBook")
     private Set<Rating> grades = new HashSet<>();
+
+    @Transient
+    private Map<Integer, Integer> countGrades = new HashMap<>();
 
     public Book() {
     }
@@ -67,5 +67,15 @@ public class Book {
                 .sum();
 
         return sum / grades.size();
+    }
+
+    public Map<Integer, Integer> getCountGrades(){
+        for (Rating grade : grades) {
+            countGrades.put(grade.getGrade(),
+                    countGrades.getOrDefault(grade.getGrade(), 0)
+                            + 1);
+        }
+
+        return countGrades;
     }
 }
